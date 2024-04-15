@@ -1,0 +1,6 @@
+cryptography==42.0.5
+diagrams==0.23.4
+fastapi==0.110.1
+hvac==2.1.0
+PyJWT==2.8.0
+PyYAML==6.0.1
