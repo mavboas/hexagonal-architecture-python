@@ -1,0 +1,7 @@
+dev:
+  host: "127.0.0.1"
+  port: 8000
+  vault_url: "http://127.0.0.1:8200"
+  vault_token: "s.VrKSUVKmrtZGMdV6MiFLVW7Z"
+  vault_secret_path: "/credentials"
+  token_expiration_time: 300
