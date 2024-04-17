@@ -5,5 +5,5 @@ class Jwt(BaseModel):
     client_id: str
     iat: int
     exp: int
-    validate: bool
+    validated: bool
     time_to_expire: str

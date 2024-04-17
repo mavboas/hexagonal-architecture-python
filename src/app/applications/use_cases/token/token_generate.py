@@ -6,18 +6,18 @@ from src.app.domain.token import Token
 import jwt
 from datetime import datetime, timedelta
 
-config = LoadConfig()
 
 
 class TokenGenerateUseCase:
     def __init__(self, client_id, client_secret):
         self.client_id = client_id
         self.client_secret = client_secret
+        self.config = LoadConfig()
 
     def execute(self):
-        _client_id = VaultDTO(Vault().return_secret(config.parameters.vault_secret_path)).client_id
-        _client_secret = VaultDTO(Vault().return_secret(config.parameters.vault_secret_path)).client_secret
-        _private_key = VaultDTO(Vault().return_secret(config.parameters.vault_secret_path)).private_key
+        _client_id = VaultDTO(Vault().return_secret(self.config.parameters.vault_secret_path)).client_id
+        _client_secret = VaultDTO(Vault().return_secret(self.config.parameters.vault_secret_path)).client_secret
+        _private_key = VaultDTO(Vault().return_secret(self.config.parameters.vault_secret_path)).private_key
         if self.client_id == _client_id and self.client_secret == _client_secret:
             return self.generate_jwt(_private_key)
         else:
@@ -27,7 +27,7 @@ class TokenGenerateUseCase:
         if iat is None:
             iat = datetime.utcnow()
         if exp is None:
-            exp = datetime.utcnow() + timedelta(seconds=config.parameters.token_expiration_time)
+            exp = datetime.utcnow() + timedelta(seconds=self.config.parameters.token_expiration_time)
         payload = {
             "sub": self.client_id,
             "client_id": self.client_id,
@@ -36,6 +36,6 @@ class TokenGenerateUseCase:
         }
         return Token(access_token=jwt.encode(payload, private_key, algorithm="RS256"),
                      token_type="Bearer",
-                     expires_in=config.parameters.token_expiration_time,
+                     expires_in=self.config.parameters.token_expiration_time,
                      refresh_token=jwt.encode(payload, private_key, algorithm="RS256")
                      )

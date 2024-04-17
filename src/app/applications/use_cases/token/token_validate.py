@@ -9,18 +9,19 @@ from src.app.domain.jwt import Jwt
 import jwt
 from src.app.config.log_config import logger
 
-config = LoadConfig()
+
 
 
 class TokenValidateUseCase:
     def __init__(self, token):
         self.token = token
+        self.config = LoadConfig()
 
     def execute(self):
-        _client_id = VaultDTO(Vault().return_secret(config.parameters.vault_secret_path)).client_id
-        _client_secret = VaultDTO(Vault().return_secret(config.parameters.vault_secret_path)).client_secret
-        _private_key = VaultDTO(Vault().return_secret(config.parameters.vault_secret_path)).private_key
-        _public_key = VaultDTO(Vault().return_secret(config.parameters.vault_secret_path)).public_key
+        _client_id = VaultDTO(Vault().return_secret(self.config.parameters.vault_secret_path)).client_id
+        _client_secret = VaultDTO(Vault().return_secret(self.config.parameters.vault_secret_path)).client_secret
+        _private_key = VaultDTO(Vault().return_secret(self.config.parameters.vault_secret_path)).private_key
+        _public_key = VaultDTO(Vault().return_secret(self.config.parameters.vault_secret_path)).public_key
         return self.validate_jwt(_public_key, _client_id, _client_secret, _private_key)
 
     def validate_jwt(self, public_key, client_id, client_secret, private_key):
@@ -33,7 +34,7 @@ class TokenValidateUseCase:
                 if TokenGenerateUseCase(client_id, client_secret).generate_jwt(private_key, iat=_iat,
                                                                                 exp=_exp).access_token == self.token:
                     _jwt = JwtDTO(jwt_dict, True)
-                    return Jwt(client_id=_jwt.client_id, iat=_jwt.iat, exp=_jwt.exp, validate=_jwt.validate,
+                    return Jwt(client_id=_jwt.client_id, iat=_jwt.iat, exp=_jwt.exp, validated=_jwt.validate,
                                time_to_expire=_jwt.time_to_expire)
                 else:
                     ErrorHandler(103, "Invalid Token").error_handler()
